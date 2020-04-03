@@ -10,5 +10,3 @@ It is an AI working on playing generalized Tic Tac Toe with provided web API on 
 
 ## Technique
 Minimax search tree, alpha-beta pruning, multi-thread programming
-
-## Achivement
