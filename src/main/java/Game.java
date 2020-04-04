@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -260,24 +261,35 @@ public class Game {
                         this.optimalY = (int) (Math.random() * (double) this.boardSize);
                     } while (board[this.optimalX][this.optimalY] != 0);
                 } else {
-                    int tempOptimalScore = Integer.MIN_VALUE;
                     // Select the move which have both the greatest temporary score and overall score
-                    for (Node child: root.children) {
-                        for (int i = 0; i < MAX_DEPTH; i+=2) {
-                            if (root.optimalMoves[i][0] == child.newMoves[0][0] && root.optimalMoves[i][1] == child.newMoves[0][1]) {
-                                int score = child.evaluate();
-                                if (score > tempOptimalScore) {
-                                    this.optimalX = child.newMoves[0][0];
-                                    this.optimalY = child.newMoves[0][1];
-                                    tempOptimalScore = score;
+                    int tempOptimalScore = Integer.MIN_VALUE;
+                    for (Node l1Node : root.children) {
+                        for (int i = 0; i < MAX_DEPTH; i += 2) {
+                            if (Arrays.equals(root.optimalMoves[i], l1Node.newMoves[0])) {
+                                int l2MaxScore = Integer.MAX_VALUE;
+                                for (Node l2Node: l1Node.children) {
+                                    int temp = l2Node.evaluate();
+                                    l2MaxScore = Math.min(l2MaxScore, temp);
                                 }
-                                break;
+                                if (tempOptimalScore < l2MaxScore) {
+                                    tempOptimalScore = l2MaxScore;
+                                    this.optimalX = l1Node.newMoves[0][0];
+                                    this.optimalY = l1Node.newMoves[0][1];
+                                }
                             }
+                            // if (root.optimalMoves[i][0] == child.newMoves[0][0] && root.optimalMoves[i][1] == child.newMoves[0][1]) {
+                            //     int score = child.evaluate();
+                            //     if (score > tempOptimalScore) {
+                            //         this.optimalX = child.newMoves[0][0];
+                            //         this.optimalY = child.newMoves[0][1];
+                            //         tempOptimalScore = score;
+                            //     }
+                            //     break;
+                            // }
                         }
                     }
                 }
             }
-
         }
         String choice = "(" + Integer.toString(this.optimalX) + ", " + Integer.toString(this.optimalY) + ")";
         System.out.println("Move = " + choice + ", time cost of move = "
@@ -722,7 +734,7 @@ public class Game {
             } else {
                 coefficient = 0.8;
             }
-            if (this.parent.symbol.equals("O")) {
+            if (selfSymbol.equals("O")) {
                 return (int) (nodeScores[0] * coefficient - nodeScores[1]);
             } else {
                 return (int) (nodeScores[1] * coefficient - nodeScores[0]);
